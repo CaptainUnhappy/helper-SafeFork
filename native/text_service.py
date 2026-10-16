@@ -77,7 +77,7 @@ class NativeTextService(NativeFileHelperService):
             # 手动指定 PID 时也先只读核对，避免向其他账号加载 DLL。
             raise RuntimeError("目标进程登录的不是绑定的机器人账号，等待正确账号登录")
         result = super().start()
-        logger.info("当前账号已自动识别：%s；好友和群聊文本已就绪", self.self_wxid)
+        logger.info("当前登录微信ID=%s；好友和群聊文本已就绪", self.self_wxid)
         return result
 
     def _read_account(self):
@@ -143,20 +143,8 @@ class NativeTextService(NativeFileHelperService):
                 data["dispatch_to_plugins"] = False
             elif data["is_at_self"]:
                 data["dispatch_to_plugins"] = True
-            if "WXBOT_AT_CHAT_PROBE" in data["msg"]:
-                import json
-                from pathlib import Path
-                path = Path(__file__).resolve().parents[1] / ".runtime/at_receive_probe.json"
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text(json.dumps({"room": data["chat_id"], "sender": data["sender_id"],
-                                            "at_members": data["at_members"], "is_at_self": data["is_at_self"],
-                                            "source": source}, ensure_ascii=False, indent=2), encoding="utf-8")
-                logger.info("艾特接收探针：at_members=%s is_at_self=%s", data["at_members"], data["is_at_self"])
             self.chats[data["chat_id"]] = {"chat_id": data["chat_id"],
                                            "is_group": bool(data["room_wxid"])}
-            if data["msg"].startswith(("WXBOT_", "echo WXBOT_")):
-                logger.info("测试消息已接收：chat_id=%s sender_id=%s group=%s marker=%s",
-                            data["chat_id"], data["sender_id"], bool(data["room_wxid"]), data["msg"])
         elif self.router.unparsed_groups > previous_unparsed:
             # 第一条失败时提示；后续通过 status 查看累计数。
             if self.router.unparsed_groups == 1:
@@ -180,7 +168,7 @@ class NativeTextService(NativeFileHelperService):
             self.last_result = self._run("--dispatch", pid=self.pid, text=content, target=to_wxid,
                                         keep_loaded=True, preserve_report=self.preserve_reports, mentions=mentions)
             if content.startswith("WXBOT_"):
-                logger.info("测试文本发送完成：chat_id=%s marker=%s success=%s native_thread=%s",
-                            to_wxid, content, self.last_result["success"],
+                logger.info("测试文本发送完成：chat_id=%s success=%s native_thread=%s",
+                            to_wxid, self.last_result["success"],
                             self.last_result.get("report", {}).get("thread_id"))
             return self.last_result["success"]

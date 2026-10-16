@@ -61,6 +61,13 @@ class BotApplication:
             self._disconnect()
 
     def _emit(self, message):
+        # 先显示会话 ID，未加入白名单的新群也能被发现；群正文不进入消息日志。
+        if message.is_group or message.chat_id.endswith("@chatroom"):
+            logger.info("群消息 | 群ID=%s", message.chat_id)
+        else:
+            logger.info("私聊消息 | 发送者微信ID=%s | 内容=%s",
+                        message.sender_id or message.chat_id,
+                        json.dumps(message.text, ensure_ascii=False))
         allowed = self.config.get("chat_allowlist", [])
         if not allowed or message.chat_id in allowed:
             if self.members is not None:
