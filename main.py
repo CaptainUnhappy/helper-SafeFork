@@ -17,6 +17,7 @@ from wxbot_framework.plugins import PluginManager
 from wxbot_framework.runtime import BotApplication
 from wxbot_framework.sdk import ServiceFacade
 from wxbot_framework.startup import ensure_account_binding
+from wxbot_framework.shutdown import ShutdownHandlers
 
 ROOT = Path(__file__).resolve().parent
 
@@ -79,7 +80,8 @@ def main():
         with InstanceLock(ROOT / ".runtime/bot.lock"):
             ensure_account_binding(ROOT, store, timeout=args.run_seconds)
             app = BotApplication(ROOT, store)
-            app.run(seconds=args.run_seconds)
+            with ShutdownHandlers(app):
+                app.run(seconds=args.run_seconds)
         return 0
     except KeyboardInterrupt:
         logging.getLogger("Main").info("账号识别已取消")
