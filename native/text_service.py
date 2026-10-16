@@ -20,8 +20,7 @@ def run_text(mode, **options):
     return run(mode, bridge_path=TEXT_DLL, **options)
 
 
-def inspect_account(pid):
-    """只读核对候选进程的当前账号，不向候选进程注入 DLL。"""
+def _inspect_identity(pid, reader):
     core = modules(pid).get("weixin.dll")
     if not core:
         return None
@@ -32,9 +31,25 @@ def inspect_account(pid):
             count = c.c_size_t()
             check(K.ReadProcessMemory(process, address, buffer, size, c.byref(count)), "只读核对账号字段")
             return buffer.raw[:count.value]
-        return read_current_account(read, core[0])
+        return reader(read, core[0])
     finally:
         K.CloseHandle(process)
+
+
+def inspect_account(pid):
+    """只读核对候选进程的当前账号，不向候选进程注入 DLL。"""
+    return _inspect_identity(pid, read_current_account)
+
+
+def inspect_profile(pid):
+    """首次绑定只读取 wxid 和微信名，名称暂不可读时仍可使用 wxid。"""
+    def read_profile(read, base):
+        profile = read_current_profile(read, base)
+        if profile:
+            return profile
+        account = read_current_account(read, base)
+        return {"wxid": account, "name": ""} if account else None
+    return _inspect_identity(pid, read_profile)
 
 
 def find_account_process(account=None):

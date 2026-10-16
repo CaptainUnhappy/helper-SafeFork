@@ -2,7 +2,7 @@
   "backend": "native_text",
   "chat_allowlist": [],
   "wechat_pid": null,
-  "wechat_account": "wxid_example_robot",
+  "wechat_account": null,
   "reconnect_seconds": 5,
   "plugin_queue_size": 128,
   "console": true,

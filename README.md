@@ -35,7 +35,7 @@ python -m pip install -r requirements.txt
 python tools/init_config.py
 ```
 
-1. `bot_config.json`：将 `wechat_account` 改为自己的机器人微信 ID。绑定保存的是账号 ID，重新登录后 PID 改变不影响选择；多开时会等待指定账号，不改用其他账号。
+1. `bot_config.json`：首次使用将 `wechat_account` 保持为 `null`，不需要提前知道自己的 wxid。运行 `python main.py` 后，程序会等待电脑微信登录；只有一个已登录账号时自动绑定，多个账号时显示昵称和 ID，输入序号选择机器人账号。绑定会保存到本地配置，重新登录后 PID 改变不影响选择；后续多开只会等待绑定的账号。
 2. `members_config.json`：在 `groups` 中添加自己要启用的群 ID，成员列表可以为空：
 
 ```json
@@ -52,7 +52,7 @@ python tools/init_config.py
 3. `llm_config.json`：填写自己的 `api_key`、`base_url` 和 `model`。模板保留 DeepSeek 接口格式，密钥为空。
 4. 模板默认关闭需要模型的 `idiom_chain`、`chat_summary`、`mention_chat` 插件。填写模型配置后，把它们的 `enabled` 改为 `true`。
 
-账号 ID 必须是实际微信 ID；群 ID 以 `@chatroom` 结尾。`test` 消息会由 `id_responder` 插件回复当前会话 ID，`chats` 控制台命令可以列出本次连接收到消息的会话。所有示例 ID 和测试用名称均为虚构数据。
+旧版配置里的 `wxid_example_robot` 和空字符串也会进入首次绑定流程；需要换机器人账号时，将本地 `wechat_account` 改回 `null` 并重启。首次选择只读取登录账号的 ID 和微信名，绑定完成后才启动机器人。群 ID 以 `@chatroom` 结尾，收到群文本时可以直接从控制台日志复制。`test` 消息会由 `id_responder` 插件回复当前会话 ID，`chats` 控制台命令可以列出本次连接收到消息的会话。所有示例 ID 和测试用名称均为虚构数据。
 
 ## 启动与验证
 
@@ -61,7 +61,7 @@ python main.py --check
 python main.py
 ```
 
-`--check` 只检查配置、插件清单与语法，不注入微信，也不调用模型。正常运行前打开微信并登录配置中的账号。
+`--check` 只检查配置、插件清单与语法，不识别或绑定账号，不注入微信，也不调用模型。直接运行 `python main.py` 时会自动补齐缺失的默认本地配置，已经填写的内容不会被覆盖；之后在微信中完成登录即可继续。
 
 默认 `INFO` 日志级别下，启动后会在控制台实时显示当前连接的微信账号、收到私聊的发送者 ID 和正文，以及收到群消息的群 ID；这些日志也会保存到 `logs/bot.log`：
 
@@ -91,7 +91,7 @@ quit
 
 增加群、修改账号或成员配置后重启。停止时使用 `quit`，等待正常卸载原生桥接；微信可以保持打开。
 
-`wechat_account` 设为 `null` 时，原生收发层可以选择唯一登录账号；启用成员目录和群记录需要明确配置机器人账号，以隔离不同账号的数据。
+首次自动绑定完成后才初始化成员目录和群记录，使用保存的机器人账号隔离数据。无交互终端且同时登录多个账号时，程序会提示在交互终端选择账号或只保留机器人账号登录，不会自动挑选其中一个。
 
 ## 目录
 
