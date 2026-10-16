@@ -4,13 +4,13 @@
 <img width="630" height="952" alt="image" src="https://github.com/user-attachments/assets/908a812a-e6e8-4e31-873c-77514adfff96" />
 
 # 已完成
-登录
-收发消息
-群聊艾特
+登录  
+收发消息  
+群聊艾特  
 
 # 进行中
-消息类型区分
-收发图片
+消息类型区分  
+收发图片  
 
 
 面向 Windows x64、微信 4.1.15.13 的 Python 插件框架。统一入口为 `main.py`，原生桥接负责文本收发，功能以插件加载。
