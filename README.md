@@ -1,7 +1,8 @@
 # 微信文本机器人框架
 项目已在linux.do公开声明[https://linux.do/](https://linux.do/t/topic/3029497/51)
 交流群
-<img width="630" height="952" alt="image" src="https://github.com/user-attachments/assets/c718fd35-329f-4267-b125-e7ca3dd842a3" />
+<img width="630" height="952" alt="image" src="https://github.com/user-attachments/assets/908a812a-e6e8-4e31-873c-77514adfff96" />
+
 
 
 
