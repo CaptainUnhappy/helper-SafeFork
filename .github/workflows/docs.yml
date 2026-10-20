@@ -1,0 +1,11 @@
+# Inert registry placeholder; the upstream file is preserved on upstream-main.
+name: Upstream documentation (disabled by SafeFork)
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  disabled:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo Disabled
